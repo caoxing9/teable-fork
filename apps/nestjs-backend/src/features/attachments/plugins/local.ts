@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { createReadStream, createWriteStream } from 'fs';
+import { createReadStream, createWriteStream, unlinkSync, existsSync } from 'fs';
 import { type Readable as ReadableStream } from 'node:stream';
 import { join, resolve } from 'path';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { getRandomString } from '@teable/core';
 import type { Request } from 'express';
 import * as fse from 'fs-extra';
@@ -15,7 +15,6 @@ import { Encryptor } from '../../../utils/encryptor';
 import { second } from '../../../utils/second';
 import StorageAdapter from './adapter';
 import type { ILocalFileUpload, IObjectMeta, IPresignParams, IRespHeaders } from './types';
-import { generateCutImagePath } from './utils';
 
 interface ITokenEncryptor {
   expiresDate: number;
@@ -24,6 +23,7 @@ interface ITokenEncryptor {
 
 @Injectable()
 export class LocalStorage implements StorageAdapter {
+  private logger = new Logger(LocalStorage.name);
   path: string;
   storageDir: string;
   expireTokenEncryptor: Encryptor<ITokenEncryptor>;
@@ -46,8 +46,14 @@ export class LocalStorage implements StorageAdapter {
   }
 
   private deleteFile(filePath: string) {
-    if (fse.existsSync(filePath)) {
-      fse.unlinkSync(filePath);
+    try {
+      unlinkSync(filePath);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error?.code === 'ENOENT') {
+        return;
+      }
+      throw error;
     }
   }
 
@@ -141,6 +147,7 @@ export class LocalStorage implements StorageAdapter {
           reject(err.message);
         });
       } catch (error) {
+        this.logger.error('saveTemporaryFile error', error);
         this.deleteFile(path);
         reject(error);
       }
@@ -150,9 +157,11 @@ export class LocalStorage implements StorageAdapter {
   async save(filePath: string, rename: string, isDelete: boolean = true) {
     const distPath = resolve(this.storageDir);
     const newFilePath = resolve(distPath, rename);
-    await fse.copy(filePath, newFilePath);
+    if (!existsSync(newFilePath)) {
+      await fse.copy(filePath, newFilePath);
+    }
     if (isDelete) {
-      await fse.remove(filePath);
+      this.deleteFile(filePath);
     }
     return join(this.path, rename);
   }
@@ -213,13 +222,21 @@ export class LocalStorage implements StorageAdapter {
     expiresIn: number = second(this.config.urlExpireIn),
     respHeaders?: IRespHeaders
   ): Promise<string> {
+    return this.getPreviewUrlInner(bucket, path, expiresIn, respHeaders);
+  }
+
+  async getPreviewUrlInner(
+    bucket: string,
+    path: string,
+    expiresIn: number,
+    respHeaders?: IRespHeaders
+  ) {
     const url = this.getUrl(bucket, path, {
       expiresDate: Math.floor(Date.now() / 1000) + expiresIn,
       respHeaders,
     });
     return this.baseConfig.storagePrefix + join('/', url);
   }
-
   verifyReadToken(token: string) {
     try {
       const { expiresDate, respHeaders } = this.expireTokenEncryptor.decrypt(token);
@@ -281,14 +298,21 @@ export class LocalStorage implements StorageAdapter {
     };
   }
 
-  async cutImage(bucket: string, path: string, width: number, height: number) {
-    const newPath = generateCutImagePath(path, width, height);
+  async cropImage(
+    bucket: string,
+    path: string,
+    width?: number,
+    height?: number,
+    _newPath?: string
+  ) {
+    const newPath = _newPath || `${path}_${width ?? 0}_${height ?? 0}`;
     const resizedImagePath = resolve(this.storageDir, bucket, newPath);
     if (fse.existsSync(resizedImagePath)) {
       return newPath;
     }
+
     const imagePath = resolve(this.storageDir, bucket, path);
-    const image = sharp(imagePath);
+    const image = sharp(imagePath, { failOn: 'none', unlimited: true });
     const metadata = await image.metadata();
     if (!metadata.width || !metadata.height) {
       throw new BadRequestException('Invalid image');

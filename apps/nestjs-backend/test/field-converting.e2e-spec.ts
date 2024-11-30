@@ -26,7 +26,7 @@ import {
   DriverClient,
   CellFormat,
 } from '@teable/core';
-import type { ITableFullVo } from '@teable/openapi';
+import { type ITableFullVo } from '@teable/openapi';
 import {
   getRecords,
   createField,
@@ -252,20 +252,7 @@ describe('OpenAPI Freely perform column transformations (e2e)', () => {
         type: FieldType.Attachment,
       };
 
-      const { newField, values } = await expectUpdate(table1, sourceFieldRo, newFieldRo, [
-        [
-          {
-            id: 'actId',
-            name: 'example.jpg',
-            token: 'ivJAXrtjLeSZ',
-            size: 1,
-            mimetype: 'image/jpeg',
-            path: 'table/example',
-            bucket: '',
-          },
-        ],
-      ]);
-      expect(values[0]).toBeTruthy();
+      const { newField } = await expectUpdate(table1, sourceFieldRo, newFieldRo);
       expect(newField.name).toEqual('New Name');
     });
 
@@ -975,7 +962,7 @@ describe('OpenAPI Freely perform column transformations (e2e)', () => {
             { name: 'x', color: Colors.Blue },
             { name: 'y', color: Colors.Red },
             { name: "','" },
-            { name: ', ' },
+            { name: ',' },
             { name: 'z' },
           ],
         },
@@ -985,8 +972,8 @@ describe('OpenAPI Freely perform column transformations (e2e)', () => {
       expect(values[1]).toEqual(['x', 'y']);
       expect(values[2]).toEqual(['x', 'z']);
       expect(values[3]).toEqual(['x', "','"]);
-      expect(values[4]).toEqual(['x', 'y', ', ']);
-      expect(values[5]).toEqual(["','", ', ']);
+      expect(values[4]).toEqual(['x', 'y', ',']);
+      expect(values[5]).toEqual(["','", ',']);
     });
 
     it('should convert long text to attachment', async () => {
@@ -3253,10 +3240,12 @@ describe('OpenAPI Freely perform column transformations (e2e)', () => {
 
       const lookupField = await createField(table1.id, lookupFieldRo);
       // add a link record
+      // record[0] for linkField1
       await updateRecordByApi(table1.id, table1.records[0].id, linkField1.id, [
         { id: table2.records[0].id },
         { id: table2.records[1].id },
       ]);
+      // record[1] for linkField2
       await updateRecordByApi(table1.id, table1.records[1].id, linkField2.id, [
         { id: table2.records[0].id },
         { id: table2.records[1].id },
@@ -3276,7 +3265,6 @@ describe('OpenAPI Freely perform column transformations (e2e)', () => {
         { id: table1.records[0].id },
         { id: table1.records[0].id },
       ]);
-
       await convertField(table1.id, lookupField.id, lookupFieldRo2);
       const linkField1After = await getField(table1.id, linkField1.id);
       expect(linkField1After).toMatchObject(linkField1);
@@ -3294,7 +3282,9 @@ describe('OpenAPI Freely perform column transformations (e2e)', () => {
         { id: table2.records[1].id },
       ]);
 
+      // record[0] for lookupField is to be undefined
       expect(records[0].fields[lookupField.id]).toBeUndefined();
+      // record[1] for lookupField
       expect(records[1].fields[lookupField.id]).toEqual([
         { id: table1.records[1].id },
         { id: table1.records[1].id },

@@ -1,6 +1,21 @@
-import { Injectable, Logger } from '@nestjs/common';
+/* eslint-disable sonarjs/no-duplicate-string */
+import {
+  BadGatewayException,
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import type { IGridColumnMeta, IFilter, IGroup } from '@teable/core';
-import { mergeWithDefaultFilter, nullsToUndefined, StatisticsFunc, ViewType } from '@teable/core';
+import {
+  CellValueType,
+  identify,
+  IdPrefix,
+  mergeWithDefaultFilter,
+  nullsToUndefined,
+  StatisticsFunc,
+  ViewType,
+} from '@teable/core';
 import type { Prisma } from '@teable/db-main-prisma';
 import { PrismaService } from '@teable/db-main-prisma';
 import type {
@@ -11,10 +26,14 @@ import type {
   IRawAggregationValue,
   IRawRowCountValue,
   IGroupPointsRo,
+  ICalendarDailyCollectionRo,
+  ICalendarDailyCollectionVo,
+  ISearchIndexByQueryRo,
+  ISearchCountRo,
 } from '@teable/openapi';
 import dayjs from 'dayjs';
 import { Knex } from 'knex';
-import { groupBy, isDate, isEmpty, keyBy } from 'lodash';
+import { get, groupBy, isDate, isEmpty, isString, keyBy } from 'lodash';
 import { InjectModel } from 'nest-knexjs';
 import { ClsService } from 'nestjs-cls';
 import { IThresholdConfig, ThresholdConfig } from '../../configs/threshold.config';
@@ -24,6 +43,7 @@ import type { IClsStore } from '../../types/cls';
 import { convertValueToStringify, string2Hash } from '../../utils';
 import type { IFieldInstance } from '../field/model/factory';
 import { createFieldInstanceByRaw } from '../field/model/factory';
+import type { DateFieldDto } from '../field/model/field-dto/date-field.dto';
 import { RecordService } from '../record/record.service';
 
 export type IWithView = {
@@ -61,17 +81,18 @@ export class AggregationService {
     tableId: string;
     withFieldIds?: string[];
     withView?: IWithView;
-    search?: [string, string];
+    search?: [string, string?, boolean?];
   }): Promise<IRawAggregationValue> {
     const { tableId, withFieldIds, withView, search } = params;
     // Retrieve the current user's ID to build user-related query conditions
     const currentUserId = this.cls.get('user.id');
 
-    const { statisticsData, fieldInstanceMap } = await this.fetchStatisticsParams({
-      tableId,
-      withView,
-      withFieldIds,
-    });
+    const { statisticsData, fieldInstanceMap, fieldInstanceMapWithoutHiddenFields } =
+      await this.fetchStatisticsParams({
+        tableId,
+        withView,
+        withFieldIds,
+      });
 
     const dbTableName = await this.getDbTableName(this.prisma, tableId);
 
@@ -81,6 +102,7 @@ export class AggregationService {
     const rawAggregationData = await this.handleAggregation({
       dbTableName,
       fieldInstanceMap,
+      fieldInstanceMapWithoutHiddenFields,
       filter,
       search,
       statisticFields,
@@ -113,6 +135,7 @@ export class AggregationService {
       groupBy,
       dbTableName,
       fieldInstanceMap,
+      fieldInstanceMapWithoutHiddenFields,
     });
 
     return { aggregations: aggregationsWithGroup };
@@ -122,10 +145,11 @@ export class AggregationService {
     aggregations: IRawAggregations;
     statisticFields: IAggregationField[] | undefined;
     filter?: IFilter;
-    search: [string, string] | undefined;
+    search?: [string, string?, boolean?];
     groupBy?: IGroup;
     dbTableName: string;
     fieldInstanceMap: Record<string, IFieldInstance>;
+    fieldInstanceMapWithoutHiddenFields: Record<string, IFieldInstance>;
   }) {
     const {
       dbTableName,
@@ -135,6 +159,7 @@ export class AggregationService {
       groupBy,
       search,
       fieldInstanceMap,
+      fieldInstanceMapWithoutHiddenFields,
     } = params;
 
     if (!groupBy || !statisticFields) return aggregations;
@@ -153,6 +178,7 @@ export class AggregationService {
       const rawGroupedAggregationData = (await this.handleAggregation({
         dbTableName,
         fieldInstanceMap,
+        fieldInstanceMapWithoutHiddenFields,
         filter,
         groupBy: groupBy.slice(0, i + 1),
         search,
@@ -201,13 +227,14 @@ export class AggregationService {
     // Retrieve the current user's ID to build user-related query conditions
     const currentUserId = this.cls.get('user.id');
 
-    const { statisticsData, fieldInstanceMap } = await this.fetchStatisticsParams({
-      tableId,
-      withView: {
-        viewId: queryRo.viewId,
-        customFilter: queryRo.filter,
-      },
-    });
+    const { statisticsData, fieldInstanceMap, fieldInstanceMapWithoutHiddenFields } =
+      await this.fetchStatisticsParams({
+        tableId,
+        withView: {
+          viewId: queryRo.viewId,
+          customFilter: queryRo.filter,
+        },
+      });
 
     const dbTableName = await this.getDbTableName(this.prisma, tableId);
 
@@ -217,6 +244,7 @@ export class AggregationService {
       tableId,
       dbTableName,
       fieldInstanceMap,
+      fieldInstanceMapWithoutHiddenFields,
       filter,
       filterLinkCellCandidate,
       filterLinkCellSelected,
@@ -237,6 +265,7 @@ export class AggregationService {
   }): Promise<{
     statisticsData: IStatisticsData;
     fieldInstanceMap: Record<string, IFieldInstance>;
+    fieldInstanceMapWithoutHiddenFields: Record<string, IFieldInstance>;
   }> {
     const { tableId, withView, withFieldIds } = params;
 
@@ -250,7 +279,18 @@ export class AggregationService {
     );
 
     const statisticsData = this.buildStatisticsData(filteredFieldInstances, viewRaw, withView);
-    return { statisticsData, fieldInstanceMap };
+
+    const fieldInstanceMapWithoutHiddenFields = { ...fieldInstanceMap };
+
+    if (viewRaw?.columnMeta) {
+      const columnMeta = JSON.parse(viewRaw?.columnMeta);
+      Object.entries(columnMeta).forEach(([key, value]) => {
+        if (get(value, ['hidden'])) {
+          delete fieldInstanceMapWithoutHiddenFields[key];
+        }
+      });
+    }
+    return { statisticsData, fieldInstanceMap, fieldInstanceMapWithoutHiddenFields };
   }
 
   private async findView(tableId: string, withView?: IWithView) {
@@ -260,11 +300,26 @@ export class AggregationService {
 
     return nullsToUndefined(
       await this.prisma.view.findFirst({
-        select: { id: true, columnMeta: true, filter: true, group: true },
+        select: {
+          id: true,
+          type: true,
+          filter: true,
+          group: true,
+          options: true,
+          columnMeta: true,
+        },
         where: {
           tableId,
           ...(withView?.viewId ? { id: withView.viewId } : {}),
-          type: { in: [ViewType.Grid, ViewType.Gantt, ViewType.Kanban] },
+          type: {
+            in: [
+              ViewType.Grid,
+              ViewType.Gantt,
+              ViewType.Kanban,
+              ViewType.Gallery,
+              ViewType.Calendar,
+            ],
+          },
           deletedTime: null,
         },
       })
@@ -316,7 +371,7 @@ export class AggregationService {
     return statisticsData;
   }
 
-  async getFieldsData(tableId: string, fieldIds?: string[]) {
+  async getFieldsData(tableId: string, fieldIds?: string[], withName?: boolean) {
     const fieldsRaw = await this.prisma.field.findMany({
       where: { tableId, ...(fieldIds ? { id: { in: fieldIds } } : {}), deletedTime: null },
     });
@@ -325,7 +380,9 @@ export class AggregationService {
     const fieldInstanceMap = fieldInstances.reduce(
       (map, field) => {
         map[field.id] = field;
-        map[field.name] = field;
+        if (withName || withName === undefined) {
+          map[field.name] = field;
+        }
         return map;
       },
       {} as Record<string, IFieldInstance>
@@ -373,9 +430,10 @@ export class AggregationService {
   private async handleAggregation(params: {
     dbTableName: string;
     fieldInstanceMap: Record<string, IFieldInstance>;
+    fieldInstanceMapWithoutHiddenFields: Record<string, IFieldInstance>;
     filter?: IFilter;
     groupBy?: IGroup;
-    search?: [string, string];
+    search?: [string, string?, boolean?];
     statisticFields?: IAggregationField[];
     withUserId?: string;
   }) {
@@ -395,8 +453,10 @@ export class AggregationService {
             .filterQuery(qb, fieldInstanceMap, filter, { withUserId })
             .appendQueryBuilder();
         }
-        if (search) {
-          this.dbProvider.searchQuery(qb, fieldInstanceMap, search);
+        if (search && search[2]) {
+          qb.where((builder) => {
+            this.dbProvider.searchQuery(builder, fieldInstanceMap, search);
+          });
         }
       })
       .from(tableAlias);
@@ -422,17 +482,19 @@ export class AggregationService {
     tableId: string;
     dbTableName: string;
     fieldInstanceMap: Record<string, IFieldInstance>;
+    fieldInstanceMapWithoutHiddenFields: Record<string, IFieldInstance>;
     filter?: IFilter;
     filterLinkCellCandidate?: IGetRecordsRo['filterLinkCellCandidate'];
     filterLinkCellSelected?: IGetRecordsRo['filterLinkCellSelected'];
     selectedRecordIds?: IGetRecordsRo['selectedRecordIds'];
-    search?: [string, string];
+    search?: [string, string?, boolean?];
     withUserId?: string;
   }) {
     const {
       tableId,
       dbTableName,
       fieldInstanceMap,
+      fieldInstanceMapWithoutHiddenFields,
       filter,
       filterLinkCellCandidate,
       filterLinkCellSelected,
@@ -449,8 +511,10 @@ export class AggregationService {
         .appendQueryBuilder();
     }
 
-    if (search) {
-      this.dbProvider.searchQuery(queryBuilder, fieldInstanceMap, search);
+    if (search && search[2]) {
+      queryBuilder.where((builder) => {
+        this.dbProvider.searchQuery(builder, fieldInstanceMapWithoutHiddenFields, search);
+      });
     }
 
     if (selectedRecordIds) {
@@ -545,5 +609,257 @@ export class AggregationService {
   public async getGroupPoints(tableId: string, query?: IGroupPointsRo) {
     const { groupPoints } = await this.recordService.getGroupRelatedData(tableId, query);
     return groupPoints;
+  }
+
+  public async getSearchCount(tableId: string, queryRo: ISearchCountRo, projection?: string[]) {
+    const { search, viewId } = queryRo;
+    const dbFieldName = await this.getDbTableName(this.prisma, tableId);
+    const { fieldInstanceMap } = await this.getFieldsData(tableId, undefined, false);
+
+    if (!search) {
+      throw new BadRequestException('Search query is required');
+    }
+
+    const searchFields = await this.recordService.getSearchFields(
+      fieldInstanceMap,
+      search,
+      viewId,
+      projection
+    );
+
+    if (searchFields?.length === 0) {
+      return { count: 0 };
+    }
+
+    const queryBuilder = this.knex(dbFieldName);
+    this.dbProvider.searchCountQuery(queryBuilder, searchFields, search[0]);
+    this.dbProvider
+      .filterQuery(queryBuilder, fieldInstanceMap, queryRo?.filter, {
+        withUserId: this.cls.get('user.id'),
+      })
+      .appendQueryBuilder();
+
+    const sql = queryBuilder.toQuery();
+
+    const result = await this.prisma.$queryRawUnsafe<{ count: number }[] | null>(sql);
+
+    return {
+      count: result ? Number(result[0]?.count) : 0,
+    };
+  }
+
+  public async getRecordIndexBySearchOrder(
+    tableId: string,
+    queryRo: ISearchIndexByQueryRo,
+    projection?: string[]
+  ) {
+    const { search, take, skip, orderBy, filter, viewId, groupBy } = queryRo;
+    const dbTableName = await this.getDbTableName(this.prisma, tableId);
+    const { fieldInstanceMap } = await this.getFieldsData(tableId, undefined, false);
+
+    if (take > 1000) {
+      throw new BadGatewayException('The maximum search index result is 1000');
+    }
+
+    if (!search) {
+      throw new BadRequestException('Search query is required');
+    }
+
+    const searchFields = await this.recordService.getSearchFields(
+      fieldInstanceMap,
+      search,
+      viewId,
+      projection
+    );
+
+    if (searchFields.length === 0) {
+      return null;
+    }
+
+    const { queryBuilder: viewRecordsQB } = await this.recordService.buildFilterSortQuery(
+      tableId,
+      queryRo
+    );
+
+    const basicSortIndex = await this.recordService.getBasicOrderIndexField(dbTableName, viewId);
+
+    const queryBuilder = this.knex.queryBuilder();
+
+    this.dbProvider.searchIndexQuery(queryBuilder, searchFields, search?.[0], dbTableName);
+
+    if (orderBy?.length || groupBy?.length) {
+      this.dbProvider
+        .sortQuery(queryBuilder, fieldInstanceMap, [...(groupBy ?? []), ...(orderBy ?? [])])
+        .appendSortBuilder();
+    }
+
+    if (filter) {
+      this.dbProvider
+        .filterQuery(queryBuilder, fieldInstanceMap, filter, {
+          withUserId: this.cls.get('user.id'),
+        })
+        .appendQueryBuilder();
+    }
+
+    queryBuilder.orderBy(basicSortIndex, 'asc');
+    const cases = searchFields.map((field, index) => {
+      return this.knex.raw(`CASE WHEN ?? = ? THEN ? END`, [
+        'matched_column',
+        field.dbFieldName,
+        index + 1,
+      ]);
+    });
+    cases.length && queryBuilder.orderByRaw(cases.join(','));
+
+    queryBuilder.limit(take);
+    skip && queryBuilder.offset(skip);
+
+    const sql = queryBuilder.toQuery();
+
+    const result = await this.prisma.$queryRawUnsafe<{ __id: string; fieldId: string }[]>(sql);
+
+    // no result found
+    if (result?.length === 0) {
+      return null;
+    }
+
+    const recordIds = result;
+
+    // step 2. find the index in current view
+    const indexQueryBuilder = this.knex
+      .select('row_num')
+      .select('__id')
+      .from((qb: Knex.QueryBuilder) => {
+        qb.select('__id')
+          .select(this.knex.client.raw('ROW_NUMBER() OVER () as row_num'))
+          .from(viewRecordsQB.as('t'))
+          .as('t1');
+      })
+      .whereIn(
+        '__id',
+        recordIds.map((record) => record.__id)
+      );
+
+    // eslint-disable-next-line
+    const indexResult = await this.prisma.$queryRawUnsafe<{ row_num: number; __id: string }[]>(
+      indexQueryBuilder.toQuery()
+    );
+
+    if (indexResult?.length === 0) {
+      return null;
+    }
+
+    const indexResultMap = keyBy(indexResult, '__id');
+
+    return result.map((item) => {
+      const index = Number(indexResultMap[item.__id]?.row_num);
+      if (isNaN(index)) {
+        throw new Error('Index not found');
+      }
+      return {
+        index,
+        fieldId: item.fieldId,
+      };
+    });
+  }
+
+  public async getCalendarDailyCollection(
+    tableId: string,
+    query: ICalendarDailyCollectionRo
+  ): Promise<ICalendarDailyCollectionVo> {
+    const { startDate, endDate, startDateFieldId, endDateFieldId, viewId, filter, search } = query;
+
+    if (identify(tableId) !== IdPrefix.Table) {
+      throw new InternalServerErrorException('query collection must be table id');
+    }
+
+    const dbTableName = await this.getDbTableName(this.prisma, tableId);
+    const fields = await this.recordService.getFieldsByProjection(tableId);
+    const fieldMap = fields.reduce(
+      (map, field) => {
+        map[field.id] = field;
+        return map;
+      },
+      {} as Record<string, IFieldInstance>
+    );
+
+    const startField = fieldMap[startDateFieldId];
+
+    if (
+      !startField ||
+      startField.cellValueType !== CellValueType.DateTime ||
+      startField.isMultipleCellValue
+    ) {
+      throw new BadRequestException('Invalid start date field id');
+    }
+
+    const endField = endDateFieldId ? fieldMap[endDateFieldId] : startField;
+
+    if (
+      !endField ||
+      endField.cellValueType !== CellValueType.DateTime ||
+      endField.isMultipleCellValue
+    ) {
+      throw new BadRequestException('Invalid end date field id');
+    }
+
+    const queryBuilder = this.knex(dbTableName);
+    const viewRaw = await this.findView(tableId, { viewId });
+    const filterStr = viewRaw?.filter;
+    const mergedFilter = mergeWithDefaultFilter(filterStr, filter);
+    const currentUserId = this.cls.get('user.id');
+
+    if (mergedFilter) {
+      this.dbProvider
+        .filterQuery(queryBuilder, fieldMap, mergedFilter, { withUserId: currentUserId })
+        .appendQueryBuilder();
+    }
+
+    if (search) {
+      const handledSearch = search ? this.recordService.parseSearch(search, fieldMap) : undefined;
+      queryBuilder.where((builder) => {
+        this.dbProvider.searchQuery(builder, fieldMap, handledSearch);
+      });
+    }
+
+    this.dbProvider.calendarDailyCollectionQuery(queryBuilder, {
+      startDate,
+      endDate,
+      startField: startField as DateFieldDto,
+      endField: endField as DateFieldDto,
+    });
+
+    const result = await this.prisma
+      .txClient()
+      .$queryRawUnsafe<
+        { date: Date | string; count: number; ids: string[] | string }[]
+      >(queryBuilder.toQuery());
+
+    const countMap = result.reduce(
+      (map, item) => {
+        const key = isString(item.date) ? item.date : item.date.toISOString().split('T')[0];
+        map[key] = Number(item.count);
+        return map;
+      },
+      {} as Record<string, number>
+    );
+    let recordIds = result
+      .map((item) => (isString(item.ids) ? item.ids.split(',') : item.ids))
+      .flat();
+    recordIds = Array.from(new Set(recordIds));
+
+    if (!recordIds.length) {
+      return {
+        countMap,
+        records: [],
+      };
+    }
+
+    const { records } = await this.recordService.getRecordsById(tableId, recordIds);
+
+    return {
+      countMap,
+      records,
+    };
   }
 }

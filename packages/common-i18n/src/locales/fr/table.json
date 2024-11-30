@@ -227,7 +227,8 @@
       "filterByView": "Filtrer les enregistrements par vue",
       "filter": "Filtrer les enregistrements",
       "hideFields": "Masquer les champs",
-      "moreOptions": "Plus d'options"
+      "moreOptions": "Plus d'options",
+      "allowNewOptionsWhenEditing": "Autoriser de nouvelles options lors de l'édition"
     },
     "subTitle": {
       "link": "Lien vers les enregistrements dans la table que vous choisissez",
@@ -362,7 +363,8 @@
   },
   "grid": {
     "prefillingRowTitle": "Ajouter un nouvel enregistrement",
-    "prefillingRowTooltip": "Veuillez entrer les données du nouvel enregistrement ci-dessous. L'enregistrement sera sauvegardé automatiquement une fois que vous cliquerez en dehors de cette ligne."
+    "prefillingRowTooltip": "Veuillez entrer les données du nouvel enregistrement ci-dessous. L'enregistrement sera sauvegardé automatiquement une fois que vous cliquerez en dehors de cette ligne.",
+    "presortRowTitle": "Cet enregistrement a été filtré ou déplacé en raison des règles de tri"
   },
   "form": {
     "fieldsManagement": "Champs",
@@ -401,8 +403,32 @@
       "insertCardAbove": "Insérer une carte au-dessus",
       "insertCardBelow": "Insérer une carte en dessous",
       "expandCard": "Développer la carte",
-      "deleteCard": "Supprimer la carte"
+      "deleteCard": "Supprimer la carte",
+      "duplicateCard": "Dupliquer la carte"
     }
+  },
+  "calendar": {
+    "toolbar": {
+      "config": "Configuration du calendrier",
+      "startDateField": "Champ de date de début",
+      "endDateField": "Champ de date de fin",
+      "titleField": "Champ de titre",
+      "colorField": "Champ de couleur",
+      "colorType": "Affichage de la couleur",
+      "customColor": "Personnaliser la couleur",
+      "alignWithRecords": "Aligner avec les enregistrements"
+    },
+    "placeholder": {
+      "selectColorField": "Sélectionner un champ de couleur"
+    },
+    "dialog": {
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "notAdd": "Non ajouter",
+      "addDateField": "Ajouter des champs de date",
+      "content": "Créer un calendrier de vue, et la table doit avoir deux champs de date : date de début et date de fin"
+    },
+    "moreLinkText": "Afficher toutes les {{count}} enregistrements"
   },
   "menu": {
     "insertRecordAbove": "Insérer un enregistrement au-dessus",
@@ -437,7 +463,9 @@
     "category": {
       "table": "Vue en grille",
       "form": "Vue en formulaire",
-      "kanban": "Vue Kanban"
+      "kanban": "Vue Kanban",
+      "gallery": "Vue en galerie",
+      "calendar": "Vue en calendrier"
     },
     "crash": {
       "title": "Plantage !",

@@ -29,6 +29,7 @@ import type {
   IGroupPoint,
   ILinearRow,
   IGroupCollection,
+  DragRegionType,
 } from './interface';
 import {
   RegionType,
@@ -54,6 +55,9 @@ export interface IGridExternalProps {
   scrollBarVisible?: boolean;
   rowIndexVisible?: boolean;
   collaborators?: ICollaborator;
+  // [rowIndex, colIndex]
+  searchCursor?: [number, number] | null;
+  searchHitIndex?: { fieldId: string; recordId: string }[];
 
   /**
    * Indicates which areas can be dragged, including rows, columns or no drag
@@ -89,7 +93,7 @@ export interface IGridExternalProps {
 
   onUndo?: () => void;
   onRedo?: () => void;
-  onCopy?: (selection: CombinedSelection) => void;
+  onCopy?: (selection: CombinedSelection, e: React.ClipboardEvent) => void;
   onPaste?: (selection: CombinedSelection, e: React.ClipboardEvent) => void;
   onDelete?: (selection: CombinedSelection) => void;
   onCellEdited?: (cell: ICellItem, newValue: IInnerCell) => void;
@@ -109,6 +113,7 @@ export interface IGridExternalProps {
   onColumnStatisticClick?: (colIndex: number, bounds: IRectangle) => void;
   onContextMenu?: (selection: CombinedSelection, position: IPosition) => void;
   onScrollChanged?: (scrollLeft: number, scrollTop: number) => void;
+  onDragStart?: (type: DragRegionType, dragIndexs: number[]) => void;
 
   /**
    * Triggered when the mouse hovers over the every type of region
@@ -183,6 +188,8 @@ const GridBase: ForwardRefRenderFunction<IGridRef, IGridProps> = (props, forward
     style,
     customIcons,
     collaborators,
+    searchCursor,
+    searchHitIndex,
     groupPoints,
     columnHeaderVisible = true,
     getCellContent,
@@ -198,6 +205,7 @@ const GridBase: ForwardRefRenderFunction<IGridRef, IGridProps> = (props, forward
     onColumnAppend,
     onColumnResize,
     onColumnOrdered,
+    onDragStart,
     onContextMenu,
     onSelectionChanged,
     onVisibleRegionChanged,
@@ -542,6 +550,8 @@ const GridBase: ForwardRefRenderFunction<IGridRef, IGridProps> = (props, forward
             scrollState={scrollState}
             rowControls={rowControls}
             collaborators={collaborators}
+            searchCursor={searchCursor}
+            searchHitIndex={searchHitIndex}
             imageManager={imageManager}
             spriteManager={spriteManager}
             coordInstance={coordInstance}
@@ -578,6 +588,8 @@ const GridBase: ForwardRefRenderFunction<IGridRef, IGridProps> = (props, forward
             draggable={draggable}
             selectable={selectable}
             collaborators={collaborators}
+            searchCursor={searchCursor}
+            searchHitIndex={searchHitIndex}
             rowControls={rowControls}
             imageManager={imageManager}
             spriteManager={spriteManager}
@@ -605,6 +617,7 @@ const GridBase: ForwardRefRenderFunction<IGridRef, IGridProps> = (props, forward
             onCopy={onCopy}
             onPaste={onPaste}
             onDelete={onDelete}
+            onDragStart={onDragStart}
             onRowAppend={onRowAppend}
             onRowExpand={onRowExpand}
             onRowOrdered={onRowOrdered}

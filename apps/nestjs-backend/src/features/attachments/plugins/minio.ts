@@ -10,7 +10,6 @@ import { IStorageConfig, StorageConfig } from '../../../configs/storage';
 import { second } from '../../../utils/second';
 import StorageAdapter from './adapter';
 import type { IPresignParams, IPresignRes, IRespHeaders } from './types';
-import { generateCutImagePath } from './utils';
 
 @Injectable()
 export class MinioStorage implements StorageAdapter {
@@ -77,8 +76,8 @@ export class MinioStorage implements StorageAdapter {
   }
 
   private async getShape(bucket: string, objectName: string) {
+    const stream = await this.minioClientPrivateNetwork.getObject(bucket, objectName);
     try {
-      const stream = await this.minioClientPrivateNetwork.getObject(bucket, objectName);
       const metaReader = sharp();
       const sharpReader = stream.pipe(metaReader);
       const { width, height } = await sharpReader.metadata();
@@ -89,6 +88,9 @@ export class MinioStorage implements StorageAdapter {
       };
     } catch (e) {
       return {};
+    } finally {
+      stream.removeAllListeners();
+      stream.destroy();
     }
   }
 
@@ -138,7 +140,12 @@ export class MinioStorage implements StorageAdapter {
     filePath: string,
     metadata: Record<string, string | number>
   ) {
-    const { etag: hash } = await this.minioClient.fPutObject(bucket, path, filePath, metadata);
+    const { etag: hash } = await this.minioClientPrivateNetwork.fPutObject(
+      bucket,
+      path,
+      filePath,
+      metadata
+    );
     return {
       hash,
       path,
@@ -178,8 +185,14 @@ export class MinioStorage implements StorageAdapter {
     }
   }
 
-  async cutImage(bucket: string, path: string, width: number, height: number) {
-    const newPath = generateCutImagePath(path, width, height);
+  async cropImage(
+    bucket: string,
+    path: string,
+    width?: number,
+    height?: number,
+    _newPath?: string
+  ) {
+    const newPath = _newPath || `${path}_${width ?? 0}_${height ?? 0}`;
     const resizedImagePath = resolve(
       StorageAdapter.TEMPORARY_DIR,
       encodeURIComponent(join(bucket, newPath))
@@ -194,13 +207,41 @@ export class MinioStorage implements StorageAdapter {
     if (!mimetype?.startsWith('image/')) {
       throw new BadRequestException('Invalid image');
     }
-    const stream = await this.minioClientPrivateNetwork.getObject(bucket, objectName);
-    const metaReader = sharp({ failOn: 'none', unlimited: true }).resize(width, height);
-    const sharpReader = stream.pipe(metaReader);
-    await sharpReader.toFile(resizedImagePath);
+    const sourceFilePath = resolve(StorageAdapter.TEMPORARY_DIR, encodeURIComponent(path));
+    // stream save in sourceFilePath
+    const writeStream = fse.createWriteStream(sourceFilePath);
+    try {
+      await new Promise((resolve, reject) => {
+        this.minioClientPrivateNetwork
+          .getObject(bucket, objectName)
+          .then((stream) => {
+            stream.pipe(writeStream);
+            writeStream.on('finish', resolve);
+            writeStream.on('error', reject);
+            stream.on('error', reject);
+          })
+          .catch(reject);
+      });
+    } catch (e) {
+      fse.removeSync(sourceFilePath);
+      throw e;
+    } finally {
+      writeStream.removeAllListeners();
+      writeStream.destroy();
+    }
+    const metaReader = sharp(sourceFilePath, { failOn: 'none', unlimited: true }).resize(
+      width,
+      height
+    );
+    await metaReader.toFile(resizedImagePath);
+    // delete source file
+    fse.removeSync(sourceFilePath);
+
     const upload = await this.uploadFileWidthPath(bucket, newPath, resizedImagePath, {
       'Content-Type': mimetype,
     });
+    // delete resized image
+    fse.removeSync(resizedImagePath);
     return upload.path;
   }
 }

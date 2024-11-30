@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import type { ICreateRecordsVo, IRecord, IRecordsVo } from '@teable/openapi';
+import type { ICreateRecordsVo, IRecord, IRecordStatusVo, IRecordsVo } from '@teable/openapi';
 import {
   createRecordsRoSchema,
   getRecordQuerySchema,
@@ -29,6 +29,8 @@ import {
   IGetRecordHistoryQuery,
   updateRecordsRoSchema,
   IUpdateRecordsRo,
+  recordInsertOrderRoSchema,
+  IRecordInsertOrderRo,
 } from '@teable/openapi';
 import { EmitControllerEvent } from '../../../event-emitter/decorators/emit-controller-event.decorator';
 import { Events } from '../../../event-emitter/events';
@@ -139,6 +141,17 @@ export class RecordOpenApiController {
     return await this.recordOpenApiService.multipleCreateRecords(tableId, createRecordsRo);
   }
 
+  @Permissions('record|create')
+  @Post(':recordId')
+  @EmitControllerEvent(Events.OPERATION_RECORDS_CREATE)
+  async duplicateRecord(
+    @Param('tableId') tableId: string,
+    @Param('recordId') recordId: string,
+    @Body(new ZodValidationPipe(recordInsertOrderRoSchema)) order: IRecordInsertOrderRo
+  ) {
+    return await this.recordOpenApiService.duplicateRecord(tableId, recordId, order);
+  }
+
   @Permissions('record|delete')
   @Delete(':recordId')
   async deleteRecord(
@@ -176,5 +189,15 @@ export class RecordOpenApiController {
     @Query(new ZodValidationPipe(getRecordsRoSchema), TqlPipe) query: IGetRecordsRo
   ) {
     return this.recordService.getDocIdsByQuery(tableId, query);
+  }
+
+  @Permissions('record|read')
+  @Get(':recordId/status')
+  async getRecordStatus(
+    @Param('tableId') tableId: string,
+    @Param('recordId') recordId: string,
+    @Query(new ZodValidationPipe(getRecordsRoSchema), TqlPipe) query: IGetRecordsRo
+  ): Promise<IRecordStatusVo> {
+    return await this.recordService.getRecordStatus(tableId, recordId, query);
   }
 }

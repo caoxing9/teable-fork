@@ -17,6 +17,7 @@ import {
   type SignatureVo,
 } from '@teable/openapi';
 import type { Request, Response } from 'express';
+import fse from 'fs-extra';
 import mimeTypes from 'mime-types';
 import { nanoid } from 'nanoid';
 import { ClsService } from 'nestjs-cls';
@@ -26,11 +27,11 @@ import { ThresholdConfig, IThresholdConfig } from '../../configs/threshold.confi
 import type { IClsStore } from '../../types/cls';
 import { FileUtils } from '../../utils';
 import { second } from '../../utils/second';
+import { AttachmentsCropQueueProcessor } from './attachments-crop.processor';
 import { AttachmentsStorageService } from './attachments-storage.service';
 import StorageAdapter from './plugins/adapter';
 import type { LocalStorage } from './plugins/local';
 import { InjectStorageAdapter } from './plugins/storage';
-
 @Injectable()
 export class AttachmentsService {
   private logger = new Logger(AttachmentsService.name);
@@ -40,6 +41,7 @@ export class AttachmentsService {
     private readonly cls: ClsService<IClsStore>,
     private readonly cacheService: CacheService,
     private readonly attachmentsStorageService: AttachmentsStorageService,
+    private readonly attachmentsCropQueueProcessor: AttachmentsCropQueueProcessor,
     @StorageConfig() readonly storageConfig: IStorageConfig,
     @ThresholdConfig() readonly thresholdConfig: IThresholdConfig,
     @InjectStorageAdapter() readonly storageAdapter: StorageAdapter
@@ -166,6 +168,13 @@ export class AttachmentsService {
         height: true,
         path: true,
       },
+    });
+    await this.attachmentsCropQueueProcessor.queue.add('attachment_crop_image', {
+      token: attachment.token,
+      path: attachment.path,
+      mimetype: attachment.mimetype,
+      height: attachment.height,
+      bucket,
     });
     const filenameHeader = filename
       ? {
@@ -333,14 +342,17 @@ export class AttachmentsService {
     contentType: string,
     contentLength: number
   ): Promise<void> {
-    await axios.put(url, stream, {
-      headers: {
-        'Content-Type': contentType,
-        'Content-Length': contentLength,
-      },
-      maxBodyLength: Infinity,
-      maxContentLength: Infinity,
-    });
+    try {
+      await axios.put(url, stream, {
+        headers: {
+          'Content-Type': contentType,
+          'Content-Length': contentLength,
+        },
+      });
+    } catch (error) {
+      stream.destroy();
+      throw error;
+    }
   }
 
   private getFilenameFromUrl(url: string): string {
@@ -350,7 +362,6 @@ export class AttachmentsService {
   }
 
   private async downloadFile(url: string, filePath: string, maxSize: number): Promise<void> {
-    const writer = fs.createWriteStream(filePath);
     let downloadedBytes = 0;
 
     const response = await axios({
@@ -360,22 +371,41 @@ export class AttachmentsService {
     });
 
     return new Promise((resolve, reject) => {
-      response.data.on('data', (chunk: Buffer) => {
-        downloadedBytes += chunk.length;
-        if (downloadedBytes > maxSize) {
-          writer.close();
-          reject(
-            new BadRequestException(
+      const writer = fs.createWriteStream(filePath);
+      const cleanup = () => {
+        writer.removeAllListeners();
+        writer.destroy();
+        response.data?.removeAllListeners();
+        response.data?.destroy?.();
+        fse.removeSync(filePath);
+      };
+      try {
+        response.data.on('data', (chunk: Buffer) => {
+          downloadedBytes += chunk.length;
+          if (downloadedBytes > maxSize) {
+            cleanup();
+            throw new BadRequestException(
               `File size exceeds the maximum limit of ${maxSize / (1024 * 1024)} MB`
-            )
-          );
-        }
-      });
+            );
+          }
+        });
 
-      response.data.pipe(writer);
+        response.data.on('error', (error: unknown) => {
+          cleanup();
+          reject(error);
+        });
 
-      writer.on('finish', resolve);
-      writer.on('error', reject);
+        response.data.pipe(writer);
+
+        writer.on('finish', resolve);
+        writer.on('error', (error: unknown) => {
+          cleanup();
+          reject(error);
+        });
+      } catch (error) {
+        cleanup();
+        reject(error);
+      }
     });
   }
 }

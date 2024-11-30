@@ -3,8 +3,10 @@ import type { Prisma } from '@teable/db-main-prisma';
 import type { IAggregationField } from '@teable/openapi';
 import type { Knex } from 'knex';
 import type { IFieldInstance } from '../features/field/model/factory';
+import type { DateFieldDto } from '../features/field/model/field-dto/date-field.dto';
 import type { SchemaType } from '../features/field/util';
 import type { IAggregationQueryInterface } from './aggregation-query/aggregation-query.interface';
+import type { BaseQueryAbstract } from './base-query/abstract';
 import type { IFilterQueryInterface } from './filter-query/filter-query.interface';
 import type { IGroupQueryExtra, IGroupQueryInterface } from './group-query/group-query.interface';
 import type { ISortQueryInterface } from './sort-query/sort-query.interface';
@@ -20,6 +22,13 @@ export type ISortQueryExtra = {
 };
 
 export type IAggregationQueryExtra = { filter?: IFilter; groupBy?: string[] } & IFilterQueryExtra;
+
+export type ICalendarDailyCollectionQueryProps = {
+  startDate: string;
+  endDate: string;
+  startField: DateFieldDto;
+  endField: DateFieldDto;
+};
 
 export interface IDbProvider {
   driver: DriverClient;
@@ -122,7 +131,20 @@ export interface IDbProvider {
   searchQuery(
     originQueryBuilder: Knex.QueryBuilder,
     fieldMap?: { [fieldId: string]: IFieldInstance },
-    search?: string[]
+    search?: [string, string?, boolean?]
+  ): Knex.QueryBuilder;
+
+  searchIndexQuery(
+    originQueryBuilder: Knex.QueryBuilder,
+    searchField: IFieldInstance[],
+    searchValue: string,
+    dbTableName: string
+  ): Knex.QueryBuilder;
+
+  searchCountQuery(
+    originQueryBuilder: Knex.QueryBuilder,
+    searchField: IFieldInstance[],
+    searchValue: string
   ): Knex.QueryBuilder;
 
   shareFilterCollaboratorsQuery(
@@ -130,4 +152,11 @@ export interface IDbProvider {
     dbFieldName: string,
     isMultipleCellValue?: boolean | null
   ): void;
+
+  baseQuery(): BaseQueryAbstract;
+
+  calendarDailyCollectionQuery(
+    qb: Knex.QueryBuilder,
+    props: ICalendarDailyCollectionQueryProps
+  ): Knex.QueryBuilder;
 }

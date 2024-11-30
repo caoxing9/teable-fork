@@ -18,7 +18,6 @@ import { IStorageConfig, StorageConfig } from '../../../configs/storage';
 import { second } from '../../../utils/second';
 import StorageAdapter from './adapter';
 import type { IPresignParams, IPresignRes, IObjectMeta, IRespHeaders } from './types';
-import { generateCutImagePath } from './utils';
 
 @Injectable()
 export class S3Storage implements StorageAdapter {
@@ -148,7 +147,7 @@ export class S3Storage implements StorageAdapter {
       height,
     };
   }
-  getPreviewUrl(
+  async getPreviewUrl(
     bucket: string,
     path: string,
     expiresIn: number = second(this.config.urlExpireIn),
@@ -231,8 +230,14 @@ export class S3Storage implements StorageAdapter {
     }
   }
 
-  async cutImage(bucket: string, path: string, width: number, height: number) {
-    const newPath = generateCutImagePath(path, width, height);
+  async cropImage(
+    bucket: string,
+    path: string,
+    width?: number,
+    height?: number,
+    _newPath?: string
+  ) {
+    const newPath = _newPath || `${path}_${width ?? 0}_${height ?? 0}`;
     const resizedImagePath = resolve(
       StorageAdapter.TEMPORARY_DIR,
       encodeURIComponent(join(bucket, newPath))
@@ -248,13 +253,28 @@ export class S3Storage implements StorageAdapter {
     if (!mimetype?.startsWith('image/')) {
       throw new BadRequestException('Invalid image');
     }
-    const metaReader = sharp();
-    const sharpReader = (stream as Readable).pipe(metaReader);
-    const resizedImage = sharpReader.resize(width, height);
-    await resizedImage.toFile(resizedImagePath);
+    if (!stream) {
+      throw new BadRequestException("can't get image stream");
+    }
+    const sourceFilePath = resolve(StorageAdapter.TEMPORARY_DIR, encodeURIComponent(path));
+    await new Promise((resolve, reject) => {
+      const writeStream = fse.createWriteStream(sourceFilePath);
+      (stream as Readable).pipe(writeStream);
+      writeStream.on('finish', resolve);
+      writeStream.on('error', reject);
+      (stream as Readable).on('error', reject);
+    });
+    const metaReader = sharp(sourceFilePath, { failOn: 'none', unlimited: true }).resize(
+      width,
+      height
+    );
+    await metaReader.toFile(resizedImagePath);
+    fse.removeSync(sourceFilePath);
     const upload = await this.uploadFileWidthPath(bucket, newPath, resizedImagePath, {
       'Content-Type': mimetype,
     });
+    // delete resized image
+    fse.removeSync(resizedImagePath);
     return upload.path;
   }
 }

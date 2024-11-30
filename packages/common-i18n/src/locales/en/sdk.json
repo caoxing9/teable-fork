@@ -23,6 +23,10 @@
     "summaryTip": "Hover to select summary",
     "actions": "Actions"
   },
+  "preview": {
+    "previewFileLimit": "Preview file size limit: {{size}}MB, please download to view instead.",
+    "loadFileError": "Failed to load file"
+  },
   "undoRedo": {
     "undo": "Undo",
     "redo": "Redo",
@@ -175,6 +179,7 @@
   },
   "expandRecord": {
     "copy": "Copy to clipboard",
+    "duplicateRecord": "Duplicate record",
     "copyRecordUrl": "Copy record URL",
     "deleteRecord": "Delete record",
     "previousRecord": "Previous record",
@@ -277,7 +282,9 @@
       "automationUpdate": "Update automation",
       "userEmailRead": "Read user email",
       "recordHistoryRead": "Read record history",
-      "baseQuery": "Query base"
+      "baseQuery": "Query base",
+      "instanceRead": "Read instance",
+      "instanceUpdate": "Update instance"
     }
   },
   "noun": {
@@ -290,7 +297,8 @@
     "automation": "Automation",
     "user": "User",
     "recordHistory": "Record History",
-    "you": "You"
+    "you": "You",
+    "instance": "Instance"
   },
   "formula": {
     "SUM": {

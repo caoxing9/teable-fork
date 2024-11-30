@@ -75,9 +75,11 @@
       "./packages/db-main-prisma",
       "./packages/eslint-config-bases",
       "./packages/ui-lib",
+      "./plugins",
     ],
     "cSpell.words": [
       "combobox",
+      "glideapps",
       "Gridlines",
       "jschardet",
       "overscan",

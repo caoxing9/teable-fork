@@ -5,7 +5,10 @@ import { FieldCore } from '../../field';
 
 export const selectFieldChoiceSchema = z.object({
   id: z.string(),
-  name: z.string().min(1),
+  name: z
+    .string()
+    .transform((s) => s.trim())
+    .pipe(z.string().min(1)),
   color: z.nativeEnum(Colors),
 });
 
@@ -16,11 +19,13 @@ export type ISelectFieldChoice = z.infer<typeof selectFieldChoiceSchema>;
 export const selectFieldOptionsSchema = z.object({
   choices: z.array(selectFieldChoiceSchema),
   defaultValue: z.union([z.string(), z.array(z.string())]).optional(),
+  preventAutoNewOptions: z.boolean().optional(),
 });
 
 export const selectFieldOptionsRoSchema = z.object({
   choices: z.array(selectFieldChoiceRoSchema),
   defaultValue: z.union([z.string(), z.array(z.string())]).optional(),
+  preventAutoNewOptions: z.boolean().optional(),
 });
 
 export type ISelectFieldOptions = z.infer<typeof selectFieldOptionsSchema>;

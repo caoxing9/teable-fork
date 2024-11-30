@@ -46,9 +46,16 @@ export const FilePreviewContent = (props: { container?: HTMLElement | null }) =>
         onMouseDown={(e) => {
           e.stopPropagation();
         }}
+        onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => {
           if (e.key === 'Escape') {
             closePreview();
+          }
+          if (e.key === 'ArrowRight') {
+            onNext();
+          }
+          if (e.key === 'ArrowLeft') {
+            onPrev();
           }
           e.stopPropagation();
         }}
