@@ -56,4 +56,13 @@ export const envValidationSchema = Joi.object({
         'The `BACKEND_GITHUB_CLIENT_SECRET` is required when `SOCIAL_AUTH_PROVIDERS` includes `github`',
     }),
   }),
+
+  BACKEND_SCIM_ENABLED: Joi.boolean().default(false),
+  BACKEND_SCIM_BEARER_TOKEN: Joi.when('BACKEND_SCIM_ENABLED', {
+    is: Joi.boolean().valid(true),
+    then: Joi.string().required().messages({
+      'any.required':
+        'The `BACKEND_SCIM_BEARER_TOKEN` is required when `BACKEND_SCIM_ENABLED` is true',
+    }),
+  }),
 });

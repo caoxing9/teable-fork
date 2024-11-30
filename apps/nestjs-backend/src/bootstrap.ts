@@ -35,6 +35,7 @@ export async function setUpAppMiddleware(app: INestApplication, configService: C
   );
   app.use(helmet());
   app.use(json({ limit: '50mb' }));
+  app.use(json({ type: 'application/scim+json', limit: '50mb' }));
   app.use(urlencoded({ limit: '50mb', extended: true }));
 
   const apiDocConfig = configService.get<IApiDocConfig>('apiDoc');

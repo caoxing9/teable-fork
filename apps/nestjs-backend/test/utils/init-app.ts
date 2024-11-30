@@ -98,6 +98,7 @@ export async function initApp() {
   );
 
   app.use(json({ limit: '50mb' }));
+  app.use(json({ type: 'application/scim+json', limit: '50mb' }));
   app.use(urlencoded({ limit: '50mb', extended: true }));
 
   await app.listen(0);

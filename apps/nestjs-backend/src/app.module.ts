@@ -30,6 +30,7 @@ import { GlobalModule } from './global/global.module';
 import { InitBootstrapProvider } from './global/init-bootstrap.provider';
 import { LoggerModule } from './logger/logger.module';
 import { WsModule } from './ws/ws.module';
+import { ScimModule } from './features/scim/scim.module';
 
 export const appModules = {
   imports: [
@@ -57,6 +58,7 @@ export const appModules = {
     PinModule,
     SettingModule,
     OAuthModule,
+    ScimModule,
     TrashModule,
     PluginModule,
     DashboardModule,
