@@ -1,12 +1,12 @@
 {
   "auth": {
-    "title": "Enter your password to view this page",
-    "submit": "Submit",
-    "password": "Password"
+    "title": "Wprowadź hasło, aby wyświetlić tę stronę",
+    "submit": "Prześlij",
+    "password": "Hasło"
   },
   "toolbar": {
-    "filterLinkSelectPlaceholder": "Select..."
+    "filterLinkSelectPlaceholder": "Wybierz..."
   },
-  "openOnNewPage": "Open on new page",
-  "errorTips": "Sharing source has enabled a Authority Matrix, viewing is not allowed"
+  "openOnNewPage": "Otwórz na nowej stronie",
+  "errorTips": "Macierz uprawnień została aktywowana, wyświetlanie jest niedozwolone"
 }

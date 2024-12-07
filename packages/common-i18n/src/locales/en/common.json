@@ -1,139 +1,139 @@
 {
   "brand": "Teable",
   "actions": {
-    "title": "Actions",
-    "save": "Save",
-    "doNotSave": "Don't Save",
-    "submit": "Submit",
-    "confirm": "Confirm",
-    "close": "Close",
-    "edit": "Edit",
-    "fill": "Fill",
-    "update": "Update",
-    "create": "Create",
-    "delete": "Delete",
-    "cancel": "Cancel",
-    "zoomIn": "Zoom in",
-    "zoomOut": "Zoom out",
-    "back": "Back",
-    "saveSucceed": "Save Succeed!",
-    "submitSucceed": "Submit Succeed!",
-    "editSucceed": "Edit Succeed!",
-    "updateSucceed": "Update Succeed!",
-    "deleteSucceed": "Delete Succeed!",
-    "resetSucceed": "Empty trash Succeed!",
-    "restoreSucceed": "Restored Succeed!",
-    "loading": "Loading...",
-    "refreshPage": "Refresh Page",
-    "yesDelete": "Yes, delete",
-    "rename": "Rename",
-    "duplicate": "Duplicate",
-    "change": "Change",
-    "upgrade": "Upgrade",
-    "search": "Search",
-    "loadMore": "Load more",
-    "collapseSidebar": "Collapse Sidebar",
-    "restore": "Restore",
-    "permanentDelete": "Permanent Delete",
+    "title": "Akcje",
+    "save": "Zapisz",
+    "doNotSave": "Nie zapisuj",
+    "submit": "Prześlij",
+    "confirm": "Potwierdź",
+    "close": "Zamknij",
+    "edit": "Edytuj",
+    "fill": "Wypełnij",
+    "update": "Zaktualizuj",
+    "create": "Stwórz",
+    "delete": "Usuń",
+    "cancel": "Anuluj",
+    "zoomIn": "Powiększ",
+    "zoomOut": "Pomniejsz",
+    "back": "Cofnij",
+    "saveSucceed": "Zmiany zostały zapisane!",
+    "submitSucceed": "Dane zostały wprowadzone!",
+    "editSucceed": "Edycja zakończona pomyślnie!",
+    "updateSucceed": "Aktualizacja zakończona pomyślnie!",
+    "deleteSucceed": "Usunięcie zakończono pomyślnie!",
+    "resetSucceed": "Czyszczenie kosza zakończono pomyślnie!",
+    "restoreSucceed": "Przywracanie zakończono pomyślnie!",
+    "loading": "Ładowanie...",
+    "refreshPage": "Odśwież stronę",
+    "yesDelete": "Tak, skasuj",
+    "rename": "Zmień nazwę",
+    "duplicate": "Powiel",
+    "change": "Zmień",
+    "upgrade": "Ulepsz",
+    "search": "Wyszukaj",
+    "loadMore": "Załaduj więcej",
+    "collapseSidebar": "Zwiń pasek boczny",
+    "restore": "Przywróć",
+    "permanentDelete": "Usuń na stałe",
     "globalSearch": "Global Search",
     "fieldSearch": "Search Field",
     "showAllRow": "Display all rows",
     "hideNotMatchRow": "Hide not match row"
   },
   "quickAction": {
-    "title": "Quick Actions...",
-    "placeHolder": "Type a command or search..."
+    "title": "Szybkie akcje...",
+    "placeHolder": "Wpisz komendę lub wyszukaj..."
   },
   "settings": {
-    "title": "Settings",
+    "title": "Ustawienia",
     "back": "Back to home",
     "account": {
-      "title": "My profile",
-      "tab": "My Account",
-      "updatePhoto": "Update photo",
-      "updateNameDesc": "Your name will be displayed on contributions and mentions. You can change it anytime.",
-      "securityTitle": "Account security",
+      "title": "Mój profil",
+      "tab": "Mój profil",
+      "updatePhoto": "Wgraj zdjęcie",
+      "updateNameDesc": "Nazwa będzie wyświetlana na liście zmian i we wzmiankach. Możesz ją zmienić w dowolnym momencie.",
+      "securityTitle": "Bezpieczeństwo konta",
       "email": "Email",
-      "password": "Password",
-      "passwordDesc": "Set a permanent password to login to your account.",
+      "password": "Hasło",
+      "passwordDesc": "Stałe hasło do logowania się na konto.",
       "changePassword": {
-        "title": "Change password",
-        "desc": "Please enter your current password and your new password.",
-        "current": "Enter your current password",
-        "new": "Enter your new password",
-        "confirm": "Confirm your new password"
+        "title": "Zmień hasło",
+        "desc": "Podaj swoje dotychczasowe hasło i nowe",
+        "current": "Podaj swoje obecne hasło",
+        "new": "Podaj nowe hasło",
+        "confirm": "Potwórz nowe hasło"
       },
       "changePasswordError": {
-        "disMatch": "Your new password does not match.",
-        "equal": "Your new password must be different from your current password.",
-        "invalid": "Your current password is invalid.",
-        "invalidNew": "Your new password is invalid, minimum 8 chars."
+        "disMatch": "Twoje nowe hasło się nie zgadza.",
+        "equal": "Nowe hasło musi różnić się od obecnego.",
+        "invalid": "Bieżące hasło jest nieprawidłowe.",
+        "invalidNew": "Twoje nowe hasło jest nieprawidłowe, minimum 8 znaków."
       },
       "changePasswordSuccess": {
-        "title": "🎉 Change password successfully.",
-        "desc": "You will be redirected to the login page in 2 seconds."
+        "title": "🎉 Pomyślnie zmieniono hasło.",
+        "desc": "Zostaniesz przekierowany na stronę logowania w ciągu 2 sekund."
       },
-      "manageToken": "Access Token",
+      "manageToken": "Tokeny dostępu",
       "addPassword": {
-        "title": "Add password",
-        "desc": "Set a permanent password to login to your account.",
-        "password": "Enter your password",
-        "confirm": "Confirm your password"
+        "title": "Dodaj hasło",
+        "desc": "Ustaw stałe hasło do logowania się na konto",
+        "password": "Podaj hasło",
+        "confirm": "Potwórz hasło"
       },
       "addPasswordError": {
-        "disMatch": "Your password does not match.",
-        "invalid": "Your password is invalid, minimum 8 chars."
+        "disMatch": "Hasła się nie zgadzają.",
+        "invalid": "Podano nieprawidłowe hasło, minimum 8 znaków."
       },
       "addPasswordSuccess": {
-        "title": "🎉 Add password successfully."
+        "title": "🎉 Pomyślnie dodano hasło."
       }
     },
     "notify": {
-      "title": "My Notifications",
-      "label": "Activity in your space",
-      "desc": "Receive emails when you get comments, mentions, page invites, reminders, access requests, and property changes."
+      "title": "Powiadomienia",
+      "label": "Aktywność w Twojej przestrzeni",
+      "desc": "Otrzymuj wiadomości e-mail, gdy otrzymasz komentarze, wzmianki, zaproszenia do strony, przypomnienia, prośby o dostęp i zmiany właściwości."
     },
     "setting": {
-      "title": "My Settings",
-      "theme": "Theme",
-      "themeDesc": "Select the theme for the app.",
-      "dark": "Dark",
-      "light": "Light",
-      "system": "System",
-      "version": "App version",
-      "language": "Language"
+      "title": "Personalizacja",
+      "theme": "Motyw",
+      "themeDesc": "Wybierz motyw dla aplikacji.",
+      "dark": "Ciemny",
+      "light": "Jasny",
+      "system": "Systemowy",
+      "version": "Wersja aplikacji",
+      "language": "Język"
     },
     "nav": {
-      "settings": "Settings",
-      "logout": "Log out"
+      "settings": "Ustawienia",
+      "logout": "Wyloguj się"
     },
     "integration": {
-      "title": "Integrations",
-      "description": "You have granted {{count}} applications access to your account.",
-      "lastUsed": "Last used at {{date}}",
-      "revoke": "Revoke",
-      "owner": "Owner by {{user}}",
-      "revokeTitle": "Are you sure you want to revoke authorization?",
-      "revokeDesc": "{{name}} will no longer be able to access the Teable API. You cannot undo this action.",
-      "scopeTitle": "Permissions",
-      "scopeDesc": "This application will be able to get the following scopes:"
+      "title": "Integracje",
+      "description": "Liczba aplikacji mająca dostęp do Twojego konta: {{count}}.",
+      "lastUsed": "Ostatnio używane {{date}}",
+      "revoke": "Wycofaj",
+      "owner": "Właściciel: {{user}}",
+      "revokeTitle": "Czy na pewno chcesz cofnąć autoryzację?",
+      "revokeDesc": "{{name}} nie będzie już w stanie uzyskać dostępu do Teable API. Nie możesz cofnąć tej akcji.",
+      "scopeTitle": "Uprawnienia",
+      "scopeDesc": "Aplikacja będzie mogła korzystać z następujących obszarów:"
     }
   },
   "noun": {
-    "table": "Table",
-    "view": "View",
-    "space": "Space",
-    "base": "Base",
-    "field": "Field",
-    "record": "Record",
-    "dashboard": "Dashboard",
-    "automation": "Automation",
-    "authorityMatrix": "Authority Matrix",
-    "adminPanel": "Admin Panel",
-    "license": "License",
-    "instanceId": "Instance ID",
+    "table": "Tabela",
+    "view": "Widok",
+    "space": "Przestrzeń",
+    "base": "Baza",
+    "field": "Pole",
+    "record": "Rekord",
+    "dashboard": "Pulpit",
+    "automation": "Automatyzacje",
+    "authorityMatrix": "Macierz uprawnień",
+    "adminPanel": "Panel administracyjny",
+    "license": "Licencja",
+    "instanceId": "ID instancji",
     "beta": "Beta",
-    "trash": "Trash",
+    "trash": "Kosz",
     "global": "Global"
   },
   "level": {
@@ -144,8 +144,8 @@
   },
   "noResult": "No Result.",
   "untitled": "Untitled",
-  "name": "Name",
-  "description": "Description",
+  "name": "Nazwa",
+  "description": "Opis",
   "required": "Required",
   "atLeastOne": "At least reserve a {{noun}}",
   "guide": {
@@ -184,8 +184,8 @@
       "emailSend": "Send invite",
       "linkSend": "Create link",
       "spaceTitle": "Space collaborators",
-      "collaboratorSearchPlaceholder": "Find a space collaborator by name or email",
-      "collaboratorJoin": "joined {{joinTime}}",
+      "collaboratorSearchPlaceholder": "Znajdź członka przestrzeni według nazwy lub adresu e-mail",
+      "collaboratorJoin": "dołączył {{joinTime}}",
       "collaboratorRemove": "Remove collaborator",
       "linkTitle": "Invite links",
       "linkCreatedTime": "created {{createdTime}}",
@@ -201,7 +201,7 @@
     }
   },
   "help": {
-    "title": "Help",
+    "title": "Pomoc",
     "mainLink": "https://help.teable.io",
     "apiLink": "https://help.teable.io/developer/api"
   },
@@ -231,59 +231,59 @@
   },
   "admin": {
     "setting": {
-      "description": "Change the settings for your current instance",
-      "allowSignUp": "Allow creating new accounts",
-      "allowSignUpDescription": "Disabling this option will prohibit new user registrations, and the register button will no longer appear on the login page.",
-      "allowSpaceInvitation": "Allow sending space invitations",
-      "allowSpaceInvitationDescription": "Disabling this option will prevent users other than administrators from inviting others to join spaces. Enabling this option will allow directly invited users to create an account even if new account registration is disabled.",
-      "allowSpaceCreation": "Allow everyone to create new spaces",
-      "allowSpaceCreationDescription": "Disabling this option will prevent users other than administrators from creating new spaces."
+      "description": "Zmień ustawienia dla Twojej obecnej instancji",
+      "allowSignUp": "Zezwalaj na tworzenie nowych kont",
+      "allowSignUpDescription": "Wyłączenie tej opcji uniemożliwi nowe rejestracje użytkowników, a przycisk rejestracji nie będzie już pojawiał się na stronie logowania.",
+      "allowSpaceInvitation": "Zezwalaj na wysyłanie zaproszeń do przestrzeni",
+      "allowSpaceInvitationDescription": "Wyłączenie tej opcji uniemożliwi użytkownikom innych niż administratorzy zapraszanie innych do dołączenia do przestrzeni. Włączenie tej opcji pozwoli zaproszonym użytkownikom na utworzenie konta, nawet jeśli rejestracja jest wyłączona.",
+      "allowSpaceCreation": "Zezwalaj wszystkim na tworzenie nowych przestrzeni",
+      "allowSpaceCreationDescription": "Wyłączenie tej opcji uniemożliwi użytkownikom innych niż administratorzy tworzenie nowych przestrzeni."
     }
   },
   "notification": {
-    "title": "Notifications",
-    "unread": "Unread",
-    "read": "Read",
-    "markAs": "Mark this notification as {{status}}",
-    "markAllAsRead": "Mark all as read",
-    "noUnread": "No {{status}} notifications",
+    "title": "Powiadomienia",
+    "unread": "Nieodczytane",
+    "read": "Odczytane",
+    "markAs": "Oznacz to powiadomienie jako {{status}}",
+    "markAllAsRead": "Oznacz wszystkie jako odczytane",
+    "noUnread": "Brak powiadomień w folderze {{status}}",
     "changeSetting": "Change page notification settings",
     "new": "new {{count}}",
     "showMore": "Show more"
   },
   "role": {
     "title": {
-      "owner": "Owner",
-      "creator": "Creator",
-      "editor": "Editor",
-      "commenter": "Commenter",
-      "viewer": "Viewer"
+      "owner": "Właściciel",
+      "creator": "Twórca",
+      "editor": "Edytor",
+      "commenter": "Komentujący",
+      "viewer": "Obserwator"
     },
     "description": {
-      "owner": "Can fully configure and edit bases, automation, authority matrices and manage space settings and billing",
-      "creator": "Can fully configure and edit bases, automation and enable the authority matrix",
-      "editor": "Can edit records and views, but cannot configure tables or fields",
-      "commenter": "Can comment on records",
-      "viewer": "Cannot edit or comment"
+      "owner": "Może w pełni konfigurować i edytować bazy, automatyzacje, macierze uprawnień oraz zarządzać ustawieniami przestrzeni i płatnościami",
+      "creator": "Może w pełni konfigurować i edytować bazy, automatyzacje i włączać macierze uprawnień",
+      "editor": "Może edytować rekordy i widoki, ale nie może konfigurować tabel ani pól",
+      "commenter": "Może komentować rekordy",
+      "viewer": "Nie może edytować ani komentować"
     }
   },
   "trash": {
-    "type": "Type",
-    "resetTrash": "Empty trash",
-    "deletedBy": "Deleted by",
-    "deletedTime": "Deleted time",
-    "fromSpace": "From \"{{name}}\" space",
-    "permanentDeleteTips": "Are you sure you want to permanently delete \"{{name}}\" {{resource}}?",
-    "resetTrashConfirm": "Are you sure you want to empty the trash?"
+    "type": "Typ",
+    "resetTrash": "Opróźnij kosz",
+    "deletedBy": "Usunięte przez",
+    "deletedTime": "Czas usunięcia",
+    "fromSpace": "Z przestrzeni \"{{name}}\"",
+    "permanentDeleteTips": "Czy na pewno chcesz usunąć \"{{resource}}: {{name}}\"?",
+    "resetTrashConfirm": "Czy na pewno chcesz opróżnić kosz?"
   },
   "pluginCenter": {
-    "pluginUrlEmpty": "Plugin Not Setting url",
-    "install": "Install",
-    "publisher": "Publisher",
-    "lastUpdated": "Last Updated",
-    "pluginNotFound": "Plugin Not Found",
+    "pluginUrlEmpty": "Wtyczka nie ustawia adresu url",
+    "install": "Zainstaluj",
+    "publisher": "Wydawca",
+    "lastUpdated": "Ostatnio zaktualizowano",
+    "pluginNotFound": "Nie znaleziono wtyczki",
     "pluginEmpty": {
-      "title": "No Plugins Yet"
+      "title": "Nie ma jeszcze wtyczek"
     }
   }
 }
