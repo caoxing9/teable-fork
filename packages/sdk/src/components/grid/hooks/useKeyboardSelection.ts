@@ -151,7 +151,7 @@ export const useKeyboardSelection = (props: ISelectionKeyboardProps) => {
       scrollBy(0, isHotkeyPressed('PageUp') ? -delta : delta);
     },
     {
-      enabled: !isEditing,
+      enabled: Boolean(activeCell && !isEditing),
       enableOnFormTags: ['input', 'select', 'textarea'],
     }
   );
