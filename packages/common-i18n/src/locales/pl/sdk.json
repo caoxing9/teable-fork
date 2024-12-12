@@ -23,6 +23,10 @@
     "summaryTip": "Hover to select summary",
     "actions": "Akcje"
   },
+  "preview": {
+    "previewFileLimit": "Preview file size limit: {{size}}MB, please download to view instead.",
+    "loadFileError": "Failed to load file"
+  },
   "undoRedo": {
     "undo": "Cofnij",
     "redo": "Przywróć",
@@ -64,7 +68,7 @@
       "goToForeignTable": "Przejdź do tej tabeli"
     },
     "user": {
-      "searchPlaceholder": "Find users by name",
+      "searchPlaceholder": "Znajdź użytkowników po nazwie",
       "notify": "Notify users once they're selected"
     },
     "select": {
@@ -175,6 +179,7 @@
   },
   "expandRecord": {
     "copy": "Skopiuj do schowka",
+    "duplicateRecord": "Zduplikuj rekord",
     "copyRecordUrl": "Skopiuj link do rekordu",
     "deleteRecord": "Usuń rekord",
     "previousRecord": "Poprzedni rekord",
@@ -277,7 +282,9 @@
       "automationUpdate": "Update automation",
       "userEmailRead": "Read user email",
       "recordHistoryRead": "Read record history",
-      "baseQuery": "Query base"
+      "baseQuery": "Query base",
+      "instanceRead": "Read instance",
+      "instanceUpdate": "Update instance"
     }
   },
   "noun": {
@@ -290,7 +297,8 @@
     "automation": "Automatyzacje",
     "user": "Użytkownik",
     "recordHistory": "Historia zmian rekordów",
-    "you": "Ty"
+    "you": "Ty",
+    "instance": "Instancja"
   },
   "formula": {
     "SUM": {

@@ -166,7 +166,7 @@ export const SearchCommand = (props: ISearchCommand) => {
               size={'sm'}
               className="flex flex-1 items-center truncate p-0"
             >
-              <span className="truncate text-sm" title={t('actions.hideNotMatchRow')}>
+              <span className="truncate text-sm" title={t('actions.showAllRow')}>
                 {t('actions.showAllRow')}
               </span>
             </Toggle>

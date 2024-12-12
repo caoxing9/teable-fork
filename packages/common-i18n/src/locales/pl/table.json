@@ -38,10 +38,10 @@
     }
   },
   "welcome": {
-    "title": "Welcome",
-    "description": "Click the + sign on the left sidebar to create a table.",
-    "help": "Visit the <HelpCenter /> for more information.",
-    "helpCenter": "Help Center"
+    "title": "Brak tabel",
+    "description": "Kliknij przycisk + na lewym pasku bocznym, aby utworzyć tabelę.",
+    "help": "Odwiedź <HelpCenter /> po więcej informacji.",
+    "helpCenter": "Centrum pomocy"
   },
   "field": {
     "fieldManagement": "Zarządzanie polami",
@@ -169,9 +169,9 @@
       }
     },
     "editor": {
-      "addField": "Dodaj pole",
-      "editField": "Edit Field",
-      "insertField": "Insert Field",
+      "addField": "Tworzenie pola",
+      "editField": "Edycja pola",
+      "insertField": "Wstawianie pola",
       "graph": "Wykres",
       "defaultValue": "Wartość domyślna",
       "reset": "Reset",
@@ -225,18 +225,19 @@
       "selectField": "Wybierz pole...",
       "linkTable": "Połączona tabela",
       "linkBase": "Połączona baza",
-      "tableNoPermission": "No permission table",
-      "baseNoPermission": "No permission base",
+      "tableNoPermission": "Brak uprawnień do tabeli",
+      "baseNoPermission": "Brak uprawnień do bazy",
       "noLinkTip": "Brak połączonych rekordów do przeszukania. Dodaj pole „Link do innego rekordu”, a potem spróbuj skonfigurować to pole jeszcze raz.",
       "fieldValidationRules": "Reguły weryfikacji wartości pól",
-      "enableValidateFieldUnique": "Wymuś unikalność wartości pola",
-      "enableValidateFieldNotNull": "Wymuś aby pole nie było puste",
+      "enableValidateFieldUnique": "Nie zezwalaj na zduplikoawne wartości",
+      "enableValidateFieldNotNull": "Nie zezwalaj na puste wartości",
       "knowMore": "dowiedz się więcej",
       "linkFieldKnowMoreLink": "https://help.teable.io/product/fields/field-type/link",
       "filterByView": "Filtrowanie według widoku",
       "filter": "Filtrowanie",
       "hideFields": "Ukrywanie pól",
-      "moreOptions": "Więcej opcji"
+      "moreOptions": "Więcej opcji",
+      "allowNewOptionsWhenEditing": "Pozwól dodawać nowe opcje podczas edycji"
     },
     "subTitle": {
       "link": "Załączaj rekordy z innej, wybranej tabeli",
@@ -262,9 +263,9 @@
       "button": "Wywołuj wcześniej zdefiniowaną akcję.",
       "lookup": "Wczytuj wartości z pola w innym, powiązanym rekordzie."
     },
-    "fieldName": "Field Name",
+    "fieldName": "Nazwa pola",
     "fieldNameOptional": "Nazwa pola (opcjonalnie)",
-    "fieldType": "Field Type"
+    "fieldType": "Rodzaj pola"
   },
   "table": {
     "newTableLabel": "Nowa tabela",
@@ -285,19 +286,19 @@
       "createBlank": "Utwórz pustą tabelę"
     },
     "actionTips": {
-      "copyAndPasteEnvironment": "Copy and paste only works in HTTPS or localhost",
-      "copyAndPasteBrowser": "Copy and paste not supported in this browser",
-      "copying": "Copying...",
-      "copySuccessful": "Copy successful",
-      "copyFailed": "Copy failed",
-      "pasting": "Pasting...",
-      "pasteSuccessful": "Paste successful",
-      "pasteFailed": "Paste failed",
-      "clearing": "Clearing...",
-      "clearSuccessful": "Clear successful",
-      "deleting": "Deleting...",
-      "deleteSuccessful": "Delete successful",
-      "pasteFileFailed": "Files can only be pasted into an attachment field"
+      "copyAndPasteEnvironment": "Kopiowanie i wklejanie działa tylko pod HTTPS albo localhost",
+      "copyAndPasteBrowser": "Kopiowanie i wklejanie nie jest obsługiwane w tej przeglądarce",
+      "copying": "Kopiowanie...",
+      "copySuccessful": "Skopiowano pomyślnie",
+      "copyFailed": "Kopiowanie nie udało się",
+      "pasting": "Wklejanie...",
+      "pasteSuccessful": "Wklejono pomyślnie",
+      "pasteFailed": "Wklejanie nie udało się",
+      "clearing": "Czyszczenie...",
+      "clearSuccessful": "Wyczyszczono",
+      "deleting": "Usuwanie...",
+      "deleteSuccessful": "Usunięto",
+      "pasteFileFailed": "Pliki można wklejać tylko do pola typu „Załącznik”"
     },
     "graph": {
       "tableLabel": "Table label",
@@ -371,61 +372,89 @@
   },
   "grid": {
     "prefillingRowTitle": "Dodawanie rekordu",
-    "prefillingRowTooltip": "Wprowadź poniżej dane nowego rekordu. Rekord zostanie zapisany automatycznie po kliknięciu gdzieś indziej."
+    "prefillingRowTooltip": "Wprowadź poniżej dane nowego rekordu. Rekord zostanie zapisany automatycznie po kliknięciu gdzieś indziej.",
+    "presortRowTitle": "This record has been filtered or moved due to sorting rules"
   },
   "form": {
-    "fieldsManagement": "Fields",
-    "addAll": "Add All",
-    "removeAll": "Remove All",
-    "hideFieldTip": "Hide the field to here",
-    "unableAddFieldTip": "Unable to add this type field",
-    "removeFromFormTip": "Remove from the form",
-    "descriptionPlaceholder": "Enter from description",
-    "dragToFormTip": "Drag the field here to add it to the form"
+    "fieldsManagement": "Pola",
+    "addAll": "Wszystkie",
+    "removeAll": "Żadne",
+    "hideFieldTip": "Ukryj tutaj pola",
+    "unableAddFieldTip": "Nie można dodać tego rodzaju pola",
+    "removeFromFormTip": "Usuń z formularza",
+    "descriptionPlaceholder": "Wprowadź opis formularza",
+    "dragToFormTip": "Przeciągnij i upuść pole tutaj, aby dodać je do formularza"
   },
   "kanban": {
     "toolbar": {
-      "hideFieldName": "Hide field name",
-      "customizeCards": "Customize cards",
-      "stackedBy": "Stacked by <0/>",
-      "chooseStackingField": "Choose a stacking field",
-      "chooseStackingFieldDescription": "Which field would you like to use for this kanban view? Your records will be stacked based on this field.",
-      "hideEmptyStack": "Hide empty stack",
-      "imageSetting": "Image Setting",
+      "hideFieldName": "Ukryj nazwę pola",
+      "customizeCards": "Dostosowanie kart",
+      "stackedBy": "Grupowanie według <0/>",
+      "chooseStackingField": "Wybierz pole grupujące",
+      "chooseStackingFieldDescription": "Którego pola chcesz użyć w tym widoku kanban? Rekordy zostaną ułożone w stos na podstawie tego pola.",
+      "hideEmptyStack": "Ukryj puste grupy",
+      "imageSetting": "Ustawienia zdjęć",
       "fit": "Fit",
-      "noImage": "No image",
-      "chooseAttachmentField": "Choose attachment field"
+      "noImage": "Brak zdjęć",
+      "chooseAttachmentField": "Wybierz pole typu „Załącznik”"
     },
     "stack": {
-      "addStack": "Add Stack",
-      "noCards": "No cards",
-      "uncategorized": "Uncategorized"
+      "addStack": "Dodaj szyld",
+      "noCards": "Brak kart",
+      "uncategorized": "Bez kategorii"
     },
     "stackMenu": {
-      "collapseStack": "Collapse stack",
-      "renameStack": "Rename stack",
-      "deleteStack": "Delete stack"
+      "collapseStack": "Zwiń szyld",
+      "renameStack": "Zmień nazwę szyldu",
+      "deleteStack": "Usuń szyld"
     },
     "cardMenu": {
       "insertCardAbove": "Insert card above",
       "insertCardBelow": "Insert card below",
       "expandCard": "Expand card",
-      "deleteCard": "Delete card"
+      "deleteCard": "Delete card",
+      "duplicateCard": "Duplicate card"
     }
   },
+  "calendar": {
+    "toolbar": {
+      "config": "Dostosowanie kalendarza",
+      "startDateField": "Pole daty rozpoczęcia",
+      "endDateField": "Pole daty zakończenia",
+      "titleField": "Pole tytułu",
+      "colorField": "Pole koloru",
+      "colorType": "Wyświetlanie koloru",
+      "customColor": "Wybrany kolor",
+      "alignWithRecords": "Pobierz z rekordu"
+    },
+    "placeholder": {
+      "selectColorField": "Wybierz pole koloru"
+    },
+    "dialog": {
+      "startDate": "Data rozpoczęcia",
+      "endDate": "Data zakończenia",
+      "notAdd": "Nie dodawaj",
+      "addDateField": "Utwórz pola dat",
+      "content": "Aby utworzyć widok kalendarza, tabela musi zawierać dwa pola dat: datę rozpoczęcia i datę zakończenia"
+    },
+    "moreLinkText": "Pokaż wszystkie {{count}} rekordy"
+  },
   "menu": {
-    "insertRecordAbove": "Insert record above",
-    "insertRecordBelow": "Insert record below",
-    "copyCells": "Copy cells",
-    "deleteRecord": "Delete record",
-    "deleteAllSelectedRecords": "Delete all selected records",
-    "editField": "Edit field",
-    "insertFieldLeft": "Insert left",
-    "insertFieldRight": "Insert right",
-    "freezeUpField": "Freeze up to this field",
-    "hideField": "Hide field",
-    "deleteField": "Delete field",
-    "deleteAllSelectedFields": "Delete all selected fields"
+    "insertRecordAbove": "Wstaw <input /> rekordy powyżej",
+    "insertRecordBelow": "Wstaw <input /> rekordy poniżej",
+    "copyCells": "Kopiuj komórki",
+    "deleteRecord": "Usuń rekord",
+    "deleteAllSelectedRecords": "Usuń wszystkie zaznaczone rekordy",
+    "editField": "Ustawienia pola",
+    "insertFieldLeft": "Utwórz pole po lewo",
+    "insertFieldRight": "Utwórz pole po prawo",
+    "freezeUpField": "Przypnij kolumny po lewo",
+    "hideField": "Ukryj pole",
+    "deleteField": "Usuń pole",
+    "deleteAllSelectedFields": "Usuń wszystkie zaznaczone pola",
+    "filterField": "Filtruj według tego pola",
+    "sortField": "Sortuj według tego pola",
+    "groupField": "Grupuj według tego pola"
   },
   "connection": {
     "title": "Połączenie z bazą danych",
@@ -435,10 +464,10 @@
     "helpLink": "https://help.teable.io/developer/database-connection"
   },
   "view": {
-    "addRecord": "Add record",
+    "addRecord": "Dodaj rekord",
     "searchView": "Przeszukaj widok...",
-    "dragToolTip": "Automatic sorting is turned on, manual drag is not available",
-    "insertToolTip": "Automatic sorting is turned on, insert with order is not available",
+    "dragToolTip": "Automatyczne sortowanie jest włączone, ręczne przeciąganie nie jest dostępne",
+    "insertToolTip": "Automatyczne sortowanie jest włączone, wstawianie w środku nie jest dostępne",
     "action": {
       "rename": "Zmień nazwę",
       "delete": "Usuń widok"
@@ -446,18 +475,24 @@
     "category": {
       "table": "Tabela",
       "form": "Formularz",
-      "kanban": "Szyld kanban"
+      "kanban": "Szyld kanban",
+      "gallery": "Galeria",
+      "calendar": "Kalendarz"
     },
     "crash": {
-      "title": "Crash!",
-      "description": "This view is broken. If the refresh still fails, please contact us. support@teable.io"
+      "title": "Awaria!",
+      "description": "Ten widok jest uszkodzony. Jeśli odświeżenie strony nie zadziała, skontaktuj się z nami. support@teable.io"
     },
-    "addPluginView": "Dodaj wtyczkę"
+    "addPluginView": "Dodaj wtyczkę",
+    "search": {
+      "field_one": "{{name}}",
+      "field_other": "{{length}} więcej"
+    }
   },
   "lastModifiedTime": "Ostatnia data modyfikacji",
   "lastModify": "Ostatnia modyfikacja: ",
   "pasteNewRecords": {
-    "title": "Do you want to add multiple records?",
-    "description": "The {{count}} records will be added to the table."
+    "title": "Chcesz dodać wiele rekordów?",
+    "description": "Liczba pól, które zostaną wstawione: {{count}}."
   }
 }
