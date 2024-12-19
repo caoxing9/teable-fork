@@ -145,55 +145,57 @@ export const ViewListItem: React.FC<IProps> = ({ view, removable, isActive }) =>
             <PopoverAnchor asChild>{commonPart}</PopoverAnchor>
           )}
         </Button>
-        <PopoverContent className="w-32 p-1">
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
-          <div className="flex flex-col" onClick={(ev) => ev.stopPropagation()}>
-            {permission['view|update'] && (
-              <Button
-                size="xs"
-                variant="ghost"
-                onClick={() => {
-                  setIsEditing(true);
-                }}
-                className="flex justify-start"
-              >
-                <Pencil className="size-3 shrink-0" />
-                {t('view.action.rename')}
-              </Button>
-            )}
-            {view.type === 'grid' && permission['view|read'] && (
-              <Button
-                size="xs"
-                variant="ghost"
-                onClick={() => {
-                  trigger?.();
-                }}
-                className="flex justify-start"
-              >
-                <Export className="size-3 shrink-0" />
-                {t('import.menu.downAsCsv')}
-              </Button>
-            )}
-            {permission['view|delete'] && (
-              <>
-                <Separator className="my-0.5" />
+        {open && (
+          <PopoverContent className="w-32 p-1">
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+            <div className="flex flex-col" onClick={(ev) => ev.stopPropagation()}>
+              {permission['view|update'] && (
                 <Button
                   size="xs"
-                  disabled={!removable}
                   variant="ghost"
-                  className="flex justify-start text-red-500"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    deleteView();
+                  onClick={() => {
+                    setIsEditing(true);
                   }}
+                  className="flex justify-start"
                 >
-                  <Trash2 className="size-3 shrink-0" />
-                  {t('view.action.delete')}
+                  <Pencil className="size-3 shrink-0" />
+                  {t('view.action.rename')}
                 </Button>
-              </>
-            )}
-          </div>
-        </PopoverContent>
+              )}
+              {view.type === 'grid' && permission['view|read'] && (
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => {
+                    trigger?.();
+                  }}
+                  className="flex justify-start"
+                >
+                  <Export className="size-3 shrink-0" />
+                  {t('import.menu.downAsCsv')}
+                </Button>
+              )}
+              {permission['view|delete'] && (
+                <>
+                  <Separator className="my-0.5" />
+                  <Button
+                    size="xs"
+                    disabled={!removable}
+                    variant="ghost"
+                    className="flex justify-start text-red-500"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      deleteView();
+                    }}
+                  >
+                    <Trash2 className="size-3 shrink-0" />
+                    {t('view.action.delete')}
+                  </Button>
+                </>
+              )}
+            </div>
+          </PopoverContent>
+        )}
       </Popover>
       <iframe ref={iframeRef} title="This for export csv download" style={{ display: 'none' }} />
     </div>
